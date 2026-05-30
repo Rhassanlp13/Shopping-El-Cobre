@@ -1,0 +1,17 @@
+Contexto del proyecto Shopping Pilón:
+
+- Frontend puro: HTML + CSS + JavaScript ES Modules nativos
+- SIN Vite, SIN webpack, SIN bundler de ningún tipo
+- SIN npm, SIN node_modules, SIN build step
+- Los archivos se sirven directamente desde Cloudflare Pages
+- Backend: Supabase (cliente cargado via CDN con import desde jsDelivr)
+- La anon key de Supabase va en config.js en texto plano (es pública por diseño, 
+  la seguridad real es RLS en Supabase)
+- NO usar import.meta.env, process.env, ni ninguna variable de entorno
+- NO sugerir npm install de nada
+- NO sugerir tsconfig, vite.config, ni archivos de configuración de build
+- Todos los imports deben ser rutas relativas reales: './utils/escape.js'
+- Las únicas dependencias externas se importan via URL de CDN directamente en el JS
+
+Cuando sugieras código nuevo, debe funcionar abriéendo index.html directamente 
+en un servidor estático sin ningún paso previo de compilación.
