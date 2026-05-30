@@ -4,7 +4,7 @@ export const carrito = {
 
     init() {
         try {
-            const guardado = localStorage.getItem('pilon_cart');
+            const guardado = localStorage.getItem('elcobre_cart');
             this._items = guardado ? JSON.parse(guardado) : [];
         } catch {
             this._items = [];
@@ -13,7 +13,7 @@ export const carrito = {
 
     _guardar() {
         try {
-            localStorage.setItem('pilon_cart', JSON.stringify(this._items));
+            localStorage.setItem('elcobre_cart', JSON.stringify(this._items));
         } catch (e) {
             console.error('[carrito] No se pudo guardar:', e);
         }

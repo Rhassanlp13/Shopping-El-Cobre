@@ -263,7 +263,7 @@ export const UI = {
         mostrarToast('Creando orden de pago...', 'info');
 
         try {
-            const SUPABASE_URL = 'https://xistchuskgnmjrzlntve.supabase.co';
+            const SUPABASE_URL = 'https://wmbryozvmnayviyanwoj.supabase.co';
             const response = await fetch(`${SUPABASE_URL}/functions/v1/create-qvapay-invoice`, {
                 method: 'POST',
                 headers: {
@@ -493,17 +493,18 @@ export const UI = {
         actualizarVista(this.varianteActualIndex);
     },
 
+    // ========= COMPARTIR PRODUCTO =========
     compartirProducto() {
         const producto = this.productos.find(p => p.id === this.productoActualId);
         if (!producto) return;
         const precioFinal = (producto.enoferta && producto.preciooferta) ? producto.preciooferta : producto.precio;
-        // ✅ Nueva ruta amigable para compartir con imagen
         const url = `${window.location.origin}/producto/${this.productoActualId}`;
-        const texto = `🛍️ *${producto.nombre}* - $${precioFinal.toLocaleString('es')} CUP\n\nMira este producto en Shopping Pilón:\n${url}`;
+        const texto = `${producto.nombre} - $${precioFinal.toLocaleString('es')} CUP\n\nMira este producto en Shopping El Cobre:\n${url}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     },
 
-    cerrarDetalle() {
+// ========= CERRAR DETALLE =========
+cerrarDetalle() {
         document.getElementById('modal-detalle').setAttribute('hidden', '');
         document.body.style.overflow = '';
         this.cerrarLightbox();
@@ -633,7 +634,7 @@ export const UI = {
         vendedores.forEach((grupo, i) => {
             const totalGrupo = grupo.items.reduce((s, it) => s + it.precio * it.cantidad, 0);
             const pedidoId = pedidosIds[i];
-            let texto = `🛍️ *Nuevo Pedido — Shopping Pilón*\n\n`;
+            let texto = `🛍️ *Nuevo Pedido — Shopping El Cobre*\n\n`;
             texto += `👤 *Comprador:* ${clienteNombre}\n`;
             texto += `📦 *Productos:*\n`;
             grupo.items.forEach(item => {
