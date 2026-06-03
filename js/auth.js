@@ -453,10 +453,16 @@ async function handleRegister() {
 
         if (user.confirmed_at === null) {
             if (infoDiv) {
-                infoDiv.innerHTML = '<i class="fas fa-envelope"></i> Te hemos enviado un correo de verificación. Revisa tu bandeja (incluye spam) y confirma tu cuenta. Luego inicia sesión.';
+                infoDiv.innerHTML = `
+            <i class="fas fa-envelope" style="font-size:1.2rem; margin-right:6px;"></i>
+            <strong>¡Revisa tu correo!</strong><br>
+            Te enviamos un enlace de verificación a <strong>${escapeHtml(email)}</strong>.
+            Haz clic en él para activar tu cuenta. Si no lo ves, revisa la carpeta de spam.
+        `;
                 infoDiv.style.display = 'block';
             }
-            mostrarToast('✅ Revisa tu correo y confirma tu cuenta.', 'info');
+            mostrarToast('✅ Revisa tu Gmail y confirma tu cuenta antes de iniciar sesión.', 'info');
+            // Limpiar contraseñas
             document.getElementById('reg-password').value = '';
             document.getElementById('reg-confirm').value = '';
             return;
@@ -592,6 +598,18 @@ export function bindAuthEvents() {
         if (e.key === 'Escape' && modal && !modal.hasAttribute('hidden')) {
             closeAuthModal();
         }
+    });
+    // En auth.js, dentro de bindAuthEvents o después de definir la función, agrega:
+    document.querySelectorAll('.toggle-password').forEach(icon => {
+        icon.addEventListener('click', function (e) {
+            const targetId = this.dataset.target;
+            const input = document.getElementById(targetId);
+            if (input) {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.classList.toggle('fa-eye-slash');
+            }
+        });
     });
 }
 
