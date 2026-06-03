@@ -1,4 +1,4 @@
-// admin.js - Panel de administración/vendedor para Shopping Pilón
+// admin.js - Panel de administración/vendedor para Shopping El Cobre
 // Incluye gestión de productos, pedidos, reseñas, vendedores, configuración de pagos QvaPay y clientes
 
 import { escapeHtml } from './utils/escape.js';
@@ -50,8 +50,7 @@ async function subirImagen(file, productoId = null) {
     if (!file) return null;
     try {
         const blobOptimizado = await resizeAndOptimizeImage(file);
-        const userId = currentUser.id; // Asegúrate de tener currentUser disponible
-        const nombreArchivo = `${userId}/${productoId ? `${productoId}_${Date.now()}.webp` : `temp_${Date.now()}.webp`}`;
+        const nombreArchivo = productoId ? `${productoId}_${Date.now()}.webp` : `temp_${Date.now()}.webp`;
         const { data, error } = await supabase.storage
             .from('products')
             .upload(nombreArchivo, blobOptimizado, {

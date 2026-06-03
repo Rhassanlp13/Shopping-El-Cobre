@@ -27,6 +27,19 @@
             max-width: 450px;
             text-align: center;
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .icon {
@@ -43,6 +56,11 @@
             text-decoration: none;
             margin-top: 1rem;
             font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #0f195e;
         }
 
         .spinner {
@@ -60,6 +78,22 @@
                 transform: rotate(360deg);
             }
         }
+
+        .error-msg {
+            color: #e53935;
+            background: #ffebee;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .success-msg {
+            color: #2e7d32;
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
     </style>
 </head>
 
@@ -72,38 +106,71 @@
             <p>Verificando tu correo, por favor espera...</p>
         </div>
     </div>
+
     <script>
+        // Configuración de Supabase (igual que en config.js)
         const supabaseUrl = 'https://wmbryozvmnayviyanwoj.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtYnJ5b3p2bW5heXZpeWFud29qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNTkxMjEsImV4cCI6MjA5NTczNTEyMX0.5Ibd14JFEjaX-DusUWrd8Z8QmCx3nnzxKZgXoCVhNYk';
         const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
         window.onload = async () => {
+            // Obtener tokens del fragmento de la URL (hash)
             const hash = window.location.hash.substring(1);
             const params = new URLSearchParams(hash);
             const access_token = params.get('access_token');
             const refresh_token = params.get('refresh_token');
             const type = params.get('type');
-            const msgDiv = document.getElementById('message');
+
             const iconDiv = document.getElementById('icon');
             const titleEl = document.getElementById('title');
+            const msgDiv = document.getElementById('message');
 
-            if (type === 'signup' && access_token) {
-                try {
-                    const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-                    if (error) throw error;
-                    iconDiv.innerHTML = '<i class="fas fa-check-circle" style="color:#25d366;"></i>';
-                    titleEl.innerText = '¡Cuenta confirmada!';
-                    msgDiv.innerHTML = '<p>Tu cuenta ha sido verificada correctamente. Serás redirigido a la tienda en unos segundos...</p><a href="/" class="btn">Ir ahora</a>';
-                    setTimeout(() => window.location.href = '/', 3000);
-                } catch (err) {
-                    iconDiv.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#e53935;"></i>';
-                    titleEl.innerText = 'Error al confirmar';
-                    msgDiv.innerHTML = `<p>${err.message || 'El enlace es inválido o ha expirado. Puedes solicitar un nuevo correo de verificación desde la tienda.'}</p><a href="/" class="btn">Volver a la tienda</a>`;
-                }
-            } else {
-                iconDiv.innerHTML = '<i class="fas fa-envelope" style="color:#ff9800;"></i>';
-                titleEl.innerText = 'Enlace no válido';
-                msgDiv.innerHTML = '<p>Este enlace no es para confirmar cuenta. Si tienes problemas, inicia sesión o solicita un nuevo correo.</p><a href="/" class="btn">Ir a la tienda</a>';
+            // Si no hay tokens o no es de tipo signup, mostrar error
+            if (!access_token || type !== 'signup') {
+                iconDiv.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#e53935;"></i>';
+                titleEl.innerText = 'Enlace inválido';
+                msgDiv.innerHTML = `
+                <div class="error-msg">
+                    <i class="fas fa-times-circle"></i> Este enlace no es válido o ha expirado.
+                </div>
+                <a href="/" class="btn">Volver a la tienda</a>
+            `;
+                return;
+            }
+
+            try {
+                // Intentar establecer la sesión con los tokens
+                const { error } = await supabase.auth.setSession({
+                    access_token,
+                    refresh_token
+                });
+
+                if (error) throw error;
+
+                // Éxito: mostrar mensaje de confirmación
+                iconDiv.innerHTML = '<i class="fas fa-check-circle" style="color:#25d366;"></i>';
+                titleEl.innerText = '¡Cuenta confirmada!';
+                msgDiv.innerHTML = `
+                <div class="success-msg">
+                    <i class="fas fa-check"></i> Tu cuenta ha sido verificada correctamente.
+                </div>
+                <p>Serás redirigido a la tienda en unos segundos...</p>
+                <a href="/" class="btn">Ir ahora</a>
+            `;
+                // Redirigir después de 3 segundos
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            } catch (err) {
+                console.error('Error confirmando cuenta:', err);
+                iconDiv.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#e53935;"></i>';
+                titleEl.innerText = 'Error al confirmar';
+                msgDiv.innerHTML = `
+                <div class="error-msg">
+                    <i class="fas fa-times-circle"></i> ${err.message || 'El enlace es inválido o ha expirado. Puedes solicitar un nuevo correo desde la tienda.'}
+                </div>
+                <a href="/" class="btn">Volver a la tienda</a>
+            `;
             }
         };
     </script>
